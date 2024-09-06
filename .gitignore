@@ -1,0 +1,2 @@
+# prevent .access_token from being committed
+.access_token

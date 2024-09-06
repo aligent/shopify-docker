@@ -1,0 +1,147 @@
+name: Naturally Sweet Shopify Theme Deployment
+
+on:
+  push:
+    branches:
+      - 'feature/*'  # Trigger for feature branches for theme checks
+      - staging      # Trigger for the staging branch to push as unpublished
+      - main         # Trigger for the main branch to publish the theme
+
+jobs:
+  theme-check:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'main' || github.ref_name == 'staging' || startsWith(github.ref_name, 'feature/')
+    container:
+      image: aaronmedinaaligent/shopify-cli-base:latest
+      credentials:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_SECRET_KEY }}
+    steps:      
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Verify Ruby Installation
+        run: ruby -v
+
+      - name: Verify Node.js Installation
+        run: |
+          node -v
+          npm -v
+
+      - name: Verify Shopify CLI Installation
+        run: shopify version
+
+      - name: List files in current directory
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -al
+
+      - name: Read variables from file
+        run: |
+          # Check if the file exists
+          if [ ! -f .env ]; then
+            echo "Error: .env file not found!"
+            exit 1
+          fi
+      
+          # Read each line from .env, ignoring comments and empty lines, and add to GitHub environment
+          while IFS= read -r line || [ -n "$line" ]; do
+            # Skip empty lines and lines that start with #
+            [[ -z "$line" || "$line" =~ ^# ]] && continue
+            
+            # Print each line being processed for debugging
+            echo "Processing line: $line"
+            
+            # Add to GitHub environment
+            echo "$line" >> $GITHUB_ENV
+          done < .env
+
+      - name: Check /theme Directory Exists
+        run: |
+          if [ ! -d "./theme" ]; then
+            echo "/theme directory does not exist."
+            exit 1
+          fi
+          echo "/theme directory exists."
+
+      - name: List Files in /theme
+        run: find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+
+      - name: Run Shopify Theme Check
+        run: shopify theme check --fail-level=$FAIL_LEVEL --path=$THEME_PATH
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: theme-check  # Ensure deploy only runs if theme-check is successful
+    if: github.ref_name == 'main' || github.ref_name == 'staging'
+    container:
+      image: aaronmedinaaligent/shopify-cli-base:latest
+      credentials:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_SECRET_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Verify Ruby Installation
+        run: ruby -v
+
+      - name: Verify Node.js Installation
+        run: |
+          node -v
+          npm -v
+
+      - name: Verify Shopify CLI Installation
+        run: shopify version
+
+      - name: List files in current directory
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -al
+
+      - name: Read variables from file
+        run: |
+          # Check if the file exists
+          if [ ! -f .env ]; then
+            echo "Error: .env file not found!"
+            exit 1
+          fi
+      
+          # Read each line from .env, ignoring comments and empty lines, and add to GitHub environment
+          while IFS= read -r line || [ -n "$line" ]; do
+            # Skip empty lines and lines that start with #
+            [[ -z "$line" || "$line" =~ ^# ]] && continue
+            
+            # Print each line being processed for debugging
+            echo "Processing line: $line"
+            
+            # Add to GitHub environment
+            echo "$line" >> $GITHUB_ENV
+          done < .env
+
+      - name: Check /theme Directory Exists
+        run: |
+          if [ ! -d "./theme" ]; then
+            echo "/theme directory does not exist."
+            exit 1
+          fi
+          echo "/theme directory exists."
+
+      - name: List Files in /theme
+        run: find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+
+      - name: Deploy Theme
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "staging" ]]; then
+            echo -e "Deploying to \033[36mSTAGING\033[0m..."
+            shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_ACCESS_TOKEN" --theme="$THEME_STAGING_ID" --path=$THEME_PATH --verbose --nodelete
+          elif [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo -e "Deploying to \033[36mPRODUCTION\033[0m..."
+            shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_ACCESS_TOKEN" --theme="$THEME_PRODUCTION_ID" --path=$THEME_PATH --verbose --allow-live
+          fi
+
+        env:
+          SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+
+        
