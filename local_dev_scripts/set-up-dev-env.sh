@@ -66,7 +66,6 @@ write_gitignore() {
     IGNORE_PATTERNS=(
         "local.env"
         "local.env.bak"
-        "Dockerfile"
     )
 
     # Check if .gitignore file exists
