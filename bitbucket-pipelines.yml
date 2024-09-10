@@ -1,0 +1,91 @@
+# Define the Docker image to use for all steps
+image: 
+  name: aaronmedinaaligent/shopify-cli-base:latest
+  username: $DOCKER_HUB_USERNAME
+  password: $DOCKER_HUB_PASSWORD
+
+definitions:
+  steps:
+    - step: &theme-check
+        name: Theme Check
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - echo "STARTING THEME CHECK..."
+          - echo "Verifying Ruby, Node.js, and Shopify CLI installations..."
+          - ruby -v      
+          - node -v     
+          - npm -v
+          - shopify version  
+          - ls -al        
+          - echo "Checking if /theme directory exists..."
+          - if [ ! -d "./theme" ]; then echo "/theme directory does not exist."; exit 1; fi
+          - echo "Listing files in the /theme directory..."
+          - find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+          - echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
+          - shopify theme check --fail-level=$FAIL_LEVEL --path=theme
+
+    - step: &deploy
+        name: Deploy Theme
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - echo "Deploying theme..."
+          - ruby -v
+          - node -v
+          - npm -v
+          - shopify version
+          - ls -al
+          - if [ ! -d "./theme" ]; then echo "/theme directory does not exist."; exit 1; fi
+          - find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+          - |
+            if [ "$BITBUCKET_DEPLOYMENT_ENVIRONMENT" == "staging" ]; then
+              echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
+              shopify theme check --fail-level=$FAIL_LEVEL --path=theme
+              echo "Deploying to..."
+              echo -e "  _____ _______       _____ _____ _   _  _____ \n / ____|__   __|/\   / ____|_   _| \ | |/ ____|\n| (___    | |  /  \ | |  __  | | |  \| | |  __ \n \___ \   | | / /\ \| | |_ | | | | .   | | |_ |\n ____) |  | |/ ____ \ |__| |_| |_| |\  | |__| |\n|_____/   |_/_/    \_\_____|_____|_| \_|\_____|\n"
+              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --nodelete"
+              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --nodelete
+            elif [ "$BITBUCKET_DEPLOYMENT_ENVIRONMENT" == "production" ]; then
+              echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
+              shopify theme check --fail-level=$FAIL_LEVEL --path=theme
+              echo "Deploying to..."
+              echo -e " _____  _____   ____  _____  _    _  _____ _______ _____ ____  _   _ \n|  __ \|  __ \ / __ \|  __ \| |  | |/ ____|__   __|_   _/ __ \| \ | |\n| |__) | |__) | |  | | |  | | |  | | |       | |    | || |  | |  \| |\n|  ___/|  _  /| |  | | |  | | |  | | |       | |    | || |  | | .   |\n| |    | | \ \| |__| | |__| | |__| | |____   | |   _| || |__| | |\  |\n|_|    |_|  \_|\____/|_____/ \____/ \_____|  |_|  |_____\____/|_| \_|\n"
+              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --allow-live"
+              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --allow-live
+            else
+              echo "Unknown deployment environment: $BITBUCKET_DEPLOYMENT_ENVIRONMENT"
+              exit 1
+            fi
+
+
+
+pipelines:
+  branches:
+    feature/*:
+      - step: *theme-check  # Reuse the theme check step
+
+    staging:
+      - step:
+          <<: *deploy  # Reuse the deploy step
+          deployment: Staging  # Specify the deployment environment as Staging
+
+    main:
+      - step:
+          <<: *deploy  # Reuse the deploy step
+          deployment: Production  # Specify the deployment environment as Production
+
+  pull-requests:
+    staging:
+      - step:
+          script:
+            - echo "Skipping theme check and deploy on PR to staging"
+
+    main:
+      - step:
+          script:
+            - echo "Skipping theme check and deploy on PR to main"
