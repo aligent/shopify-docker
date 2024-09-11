@@ -8,10 +8,6 @@ definitions:
   steps:
     - step: &theme-check
         name: Theme Check
-        services:
-          - docker
-        caches:
-          - docker
         script:
           - echo "STARTING THEME CHECK..."
           - echo "Verifying Ruby, Node.js, and Shopify CLI installations..."
@@ -29,10 +25,6 @@ definitions:
 
     - step: &deploy
         name: Deploy Theme
-        services:
-          - docker
-        caches:
-          - docker
         script:
           - echo "Deploying theme..."
           - ruby -v
@@ -48,15 +40,15 @@ definitions:
               shopify theme check --fail-level=$FAIL_LEVEL --path=theme
               echo "Deploying to..."
               echo -e "  _____ _______       _____ _____ _   _  _____ \n / ____|__   __|/\   / ____|_   _| \ | |/ ____|\n| (___    | |  /  \ | |  __  | | |  \| | |  __ \n \___ \   | | / /\ \| | |_ | | | | .   | | |_ |\n ____) |  | |/ ____ \ |__| |_| |_| |\  | |__| |\n|_____/   |_/_/    \_\_____|_____|_| \_|\_____|\n"
-              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --nodelete"
-              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --nodelete
+              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --nodelete"
+              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --nodelete
             elif [ "$BITBUCKET_DEPLOYMENT_ENVIRONMENT" == "production" ]; then
               echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
               shopify theme check --fail-level=$FAIL_LEVEL --path=theme
               echo "Deploying to..."
               echo -e " _____  _____   ____  _____  _    _  _____ _______ _____ ____  _   _ \n|  __ \|  __ \ / __ \|  __ \| |  | |/ ____|__   __|_   _/ __ \| \ | |\n| |__) | |__) | |  | | |  | | |  | | |       | |    | || |  | |  \| |\n|  ___/|  _  /| |  | | |  | | |  | | |       | |    | || |  | | .   |\n| |    | | \ \| |__| | |__| | |__| | |____   | |   _| || |__| | |\  |\n|_|    |_|  \_|\____/|_____/ \____/ \_____|  |_|  |_____\____/|_| \_|\n"
-              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --allow-live"
-              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --allow-live
+              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --allow-live"
+              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --allow-live
             else
               echo "Unknown deployment environment: $BITBUCKET_DEPLOYMENT_ENVIRONMENT"
               exit 1

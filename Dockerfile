@@ -7,7 +7,7 @@ ARG GROUP_ID
 
 # Create a group and user matching the host UID and GID to avoid permission issues
 RUN groupadd -g $GROUP_ID shopifygroup && \
-    useradd -u $USER_ID -g shopifygroup -m shopifyuser
+    useradd -l -u $USER_ID -g shopifygroup -m shopifyuser
 
 # Create the /theme directory and set the correct permissions
 RUN mkdir -p /shopify && chown shopifyuser:shopifygroup /shopify
