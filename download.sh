@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Define repository details
-USER="aaron-medina-aligent"         # Replace with the GitHub username or organization
-REPO="test-shop-repo"       # Replace with the repository name
+USER="aligent"         # Replace with the GitHub username or organization
+REPO="aligent-shopify-theme-development-template"       # Replace with the repository name
 BRANCH="main"           # Replace with the branch name, e.g., "main" or "master"
 
 # GitHub API URL to fetch all files in the repository

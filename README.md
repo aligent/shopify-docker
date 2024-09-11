@@ -1,16 +1,20 @@
-# Aligent Shopify Theme Development Tools
+# Aligent Shopify Theme Development Template
 
 **Version**: (beta) 1.0  
 **Author**: Aaron Medina (aaron.medina@aligent.com.au)
 
 ## Description
 
-This repository contains scripts and tools designed to set up and manage a Shopify theme development environment for clients. It includes various utilities for configuring a local development setup, working with Shopify themes, and integrating with Bitbucket Pipelines for CI/CD processes. These tools streamline the development workflow by providing a Docker-based environment, command-line utilities for interacting with Shopify themes, and scripts to automate repetitive tasks.
+This contains scripts designed to set up and assist in Shopify theme development. It includes various utilities for configuring a local development setup, working with Shopify themes, and integrating with Bitbucket Pipelines for CI/CD processes. These tools streamline the development workflow by providing a Docker-based environment, command-line utilities for interacting with Shopify themes, and scripts to automate repetitive tasks.
+
+## Limitations
+
+Currently, this setup only supports Bitbucket Pipelines. If the client's repository is hosted on platforms like GitHub, GitLab, or others, the deployment pipeline functionality will not be available and would need to be configured separately.
 
 ## File Structure
 
 ```bash
-shopify-theme-development-tools
+aligent-shopify-theme-development-template
 ├── bitbucket-pipelines.yml
 ├── Dockerfile
 ├── download.sh
