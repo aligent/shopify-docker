@@ -11,10 +11,7 @@ definitions:
         script:
           - echo "STARTING THEME CHECK..."
           - echo "Verifying Ruby, Node.js, and Shopify CLI installations..."
-          - ruby -v      
-          - node -v     
-          - npm -v
-          - shopify version  
+          - ruby -v && node -v && npm -v && shopify version
           - ls -al        
           - echo "Checking if /theme directory exists..."
           - if [ ! -d "./theme" ]; then echo "/theme directory does not exist."; exit 1; fi
@@ -27,34 +24,16 @@ definitions:
         name: Deploy Theme
         script:
           - echo "Deploying theme..."
-          - ruby -v
-          - node -v
-          - npm -v
-          - shopify version
+          - ruby -v && node -v && npm -v && shopify version
           - ls -al
           - if [ ! -d "./theme" ]; then echo "/theme directory does not exist."; exit 1; fi
           - find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
-          - |
-            if [ "$BITBUCKET_DEPLOYMENT_ENVIRONMENT" == "staging" ]; then
-              echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
-              shopify theme check --fail-level=$FAIL_LEVEL --path=theme
-              echo "Deploying to..."
-              echo -e "  _____ _______       _____ _____ _   _  _____ \n / ____|__   __|/\   / ____|_   _| \ | |/ ____|\n| (___    | |  /  \ | |  __  | | |  \| | |  __ \n \___ \   | | / /\ \| | |_ | | | | .   | | |_ |\n ____) |  | |/ ____ \ |__| |_| |_| |\  | |__| |\n|_____/   |_/_/    \_\_____|_____|_| \_|\_____|\n"
-              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --nodelete"
-              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --nodelete
-            elif [ "$BITBUCKET_DEPLOYMENT_ENVIRONMENT" == "production" ]; then
-              echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
-              shopify theme check --fail-level=$FAIL_LEVEL --path=theme
-              echo "Deploying to..."
-              echo -e " _____  _____   ____  _____  _    _  _____ _______ _____ ____  _   _ \n|  __ \|  __ \ / __ \|  __ \| |  | |/ ____|__   __|_   _/ __ \| \ | |\n| |__) | |__) | |  | | |  | | |  | | |       | |    | || |  | |  \| |\n|  ___/|  _  /| |  | | |  | | |  | | |       | |    | || |  | | .   |\n| |    | | \ \| |__| | |__| | |__| | |____   | |   _| || |__| | |\  |\n|_|    |_|  \_|\____/|_____/ \____/ \_____|  |_|  |_____\____/|_| \_|\n"
-              echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID --path=theme --verbose --allow-live"
-              shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" --path=theme --verbose --allow-live
-            else
-              echo "Unknown deployment environment: $BITBUCKET_DEPLOYMENT_ENVIRONMENT"
-              exit 1
-            fi
-
-
+          - echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
+          - shopify theme check --fail-level=$FAIL_LEVEL --path=theme
+          - echo "Deploying to $BITBUCKET_DEPLOYMENT_ENVIRONMENT..."
+          - echo -e "$ASCII_LABEL"
+          - echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID $THEME_PUSH_ARGS"
+          - shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" $THEME_PUSH_ARGS
 
 pipelines:
   branches:
