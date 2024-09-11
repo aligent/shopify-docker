@@ -63,7 +63,11 @@ Create a new Bitbucket repository for the client's Shopify theme.
 Navigate to the newly created repository and run the following command to download all necessary files:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/aaron-medina-aligent/test-shop-repo/main/download.sh)
+bash <(curl -s https://raw.githubusercontent.com/aligent/aligent-shopify-theme-development-template/main/download.sh)
+```
+or
+```bash
+git clone namespace/package --depth=1 --branch=X && rm .git
 ```
 
 This will also generate a .gitignore file to ensure that sensitive files like local.env are not included in the repository.
@@ -153,11 +157,14 @@ Configure the following deployment variables under Bitbucket repository settings
 Staging:
 - THEME_ID
 - FAIL_LEVEL
+- ASCII_LABEL
+- THEME_PUSH_ARGS
 
 Production:
-
 - THEME_ID
 - FAIL_LEVEL
+- ASCII_LABEL
+- THEME_PUSH_ARGS
 
 These configurations are essential for deploying themes to different environments.
 
