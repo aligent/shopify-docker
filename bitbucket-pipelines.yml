@@ -1,0 +1,62 @@
+# Define the Docker image to use for all steps
+image: 
+  name: aaronmedinaaligent/shopify-cli-base:latest
+  username: $DOCKER_HUB_USERNAME
+  password: $DOCKER_HUB_PASSWORD
+
+definitions:
+  steps:
+    - step: &theme-check
+        name: Theme Check
+        script:
+          - echo "STARTING THEME CHECK..."
+          - echo "Verifying Ruby, Node.js, and Shopify CLI installations..."
+          - ruby -v && node -v && npm -v && shopify version
+          - ls -al        
+          - echo "Checking if /theme directory exists..."
+          - if [ ! -d "./theme" ]; then echo "/theme directory does not exist."; exit 1; fi
+          - echo "Listing files in the /theme directory..."
+          - find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+          - echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
+          - shopify theme check --fail-level=$FAIL_LEVEL --path=theme
+
+    - step: &deploy
+        name: Deploy Theme
+        script:
+          - echo "Deploying theme..."
+          - ruby -v && node -v && npm -v && shopify version
+          - ls -al
+          - if [ ! -d "./theme" ]; then echo "/theme directory does not exist."; exit 1; fi
+          - find theme -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+          - echo "Running shopify theme check --fail-level=$FAIL_LEVEL --path=theme"
+          - shopify theme check --fail-level=$FAIL_LEVEL --path=theme
+          - echo "Deploying to $BITBUCKET_DEPLOYMENT_ENVIRONMENT..."
+          - echo -e "$ASCII_LABEL"
+          - echo "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID $THEME_PUSH_ARGS"
+          - shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" $THEME_PUSH_ARGS
+
+pipelines:
+  branches:
+    feature/*:
+      - step: *theme-check  # Reuse the theme check step
+
+    staging:
+      - step:
+          <<: *deploy  # Reuse the deploy step
+          deployment: Staging  # Specify the deployment environment as Staging
+
+    main:
+      - step:
+          <<: *deploy  # Reuse the deploy step
+          deployment: Production  # Specify the deployment environment as Production
+
+  pull-requests:
+    staging:
+      - step:
+          script:
+            - echo "Skipping theme check and deploy on PR to staging"
+
+    main:
+      - step:
+          script:
+            - echo "Skipping theme check and deploy on PR to main"
