@@ -101,7 +101,7 @@ Our custom Shopify wrapper provides simplified and automated versions of commonl
 
 - ```shopify theme list``` Lists all available themes and their details for your Shopify store. This command helps you quickly view and manage your themes without needing additional parameters.
 
-- ```shopify theme pull``` This command is DISABLED in the development environment to prevent themes from being pushed directly, ensuring that all deployments go through the designated deployment pipeline for better version control and consistency.
+- ```shopify theme push``` This command is DISABLED in the development environment to prevent themes from being pushed directly, ensuring that all deployments go through the designated deployment pipeline for better version control and consistency.
 
 - ```shopify show store-config``` Displays the current environment variables related to your Shopify store configuration. This command outputs the values for SHOPIFY_STORE, THEME_ID, and SHOPIFY_ACCESS_TOKEN, allowing you to quickly review the current setup without opening configuration files manually.
 
