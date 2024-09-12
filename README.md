@@ -2,7 +2,7 @@
 
 ## Description
 
-Docker image for running the shopify-cli command without requiring it to be installed locally. It includes various utilities for configuring a local development setup, working with Shopify themes, and integrating with Bitbucket Pipelines for CI/CD processes. These tools streamline the development workflow by providing a Docker-based environment, simplified command-line utilities for interacting with Shopify themes.
+Docker image for running the shopify-cli command without requiring it to be installed locally. It includes setup script, few custom shopify commands that simplifies working with Shopify themes via the shopify_wrapper, and yml file for integrating with Bitbucket Pipelines. 
 
 ## Limitations
 
