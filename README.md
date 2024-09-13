@@ -34,22 +34,22 @@ Currently, this setup only supports Bitbucket Pipelines. If the client's reposit
 
 - **README.md**: Provides an overview of the project, including setup instructions, usage guidelines, and other relevant documentation to help users understand and work with the project effectively.
 
-- **set-up.sh**: A setup script that initializes environment variables, prompts the user for required configuration values (like Shopify store URL, theme ID, and access token), and sets up the local environment for running Docker Compose commands. It ensures that the necessary variables are exported and available for the Docker environment.
+- **set-up.sh**: A setup script that initializes environment variables, prompts the user for required configuration values (like Shopify store URL, theme ID, and access token), and sets up the local environment for running Docker Compose commands. It ensures that the necessary variables are exported and available for the Docker environment and adding local development files to .gitignore.
 
 
 
 ## Instructions
 
-### Step 1: Create a New Dev/Client Bitbucket Repository
+### Step 1: Create NEW or CLONE existing Dev/Client Bitbucket Repository
 
-Create a new Bitbucket repository for the Shopify theme development.
+Create new or Clone Bitbucket repository for the Shopify theme development.
 
 ### Step 2: Download this repo.
 
-Navigate to the newly created repository and run the following command so it will not include the repository meta-data.
+Navigate to the repository and run the following command so it will not include the repository meta-data and README.md.
 
 ```bash
-mkdir temp-clone && cd temp-clone && git init && git remote add origin git@github.com:aligent/shopify-dev-template.git && git config core.sparseCheckout true && echo "/*" > .git/info/sparse-checkout && git pull --depth=1 origin main && mv * .. && cd .. && rm -rf temp-clone
+mkdir temp-clone && cd temp-clone && git init && git remote add origin git@github.com:aligent/shopify-dev-template.git && git config core.sparseCheckout true && echo "/*" > .git/info/sparse-checkout && echo '!/README.md' >> .git/info/sparse-checkout && git pull --depth=1 origin main && mv * .. && cd .. && rm -rf temp-clone
 
 ```
 
@@ -61,7 +61,7 @@ Run the following command to initialize the development environment variables an
 source set-up.sh
 ```
 
-Ensure that you use source to execute the script so that environment variables are set correctly in your current shell session.
+Ensure that you use ```source``` to execute the script so that environment variables are set correctly in your current shell session.
 
 ### Step 4: Build the Docker Image
 
@@ -81,13 +81,14 @@ docker-compose up -d
 
 The -d flag runs the containers in detached mode.
 
-### Step 6: (OPTIONAL) Check the Logs
+### Step 6: (RECOMMENDED) Check the Logs
 
 To monitor the live output of the shopify theme pull command and other processes within the container, you can follow the logs:
 
 ```bash
 docker-compose logs -f shopify-cli
 ```
+```ctrl+c``` to exit once done.
 
 ## Additional Notes
 
@@ -95,13 +96,13 @@ docker-compose logs -f shopify-cli
 
 Our custom Shopify wrapper provides simplified and automated versions of commonly used Shopify CLI commands to streamline your workflow:
 
-- ```shopify theme pull``` When run without any arguments, this command automatically uses the store URL, access token, and theme ID specified during the setup process, saving you time and ensuring consistency. If you need to provide specific arguments, the original Shopify theme pull functionality is still available by including them explicitly in the command.
+- ```shopify theme pull``` When run without any arguments, this command automatically uses the SHOPIFY_STORE, SHOPIFY_ACCESS_TOKEN, and THEME_ID in the environment variables specified during the setup process, saving you time and ensuring consistency. If you need to provide specific arguments, the original Shopify theme pull functionality is still available by including them explicitly in the command.
 
-- ```shopify theme dev up``` This is a shorthand command for running shopify theme dev with predefined arguments: --password="$SHOPIFY_ACCESS_TOKEN", --store="$SHOPIFY_STORE", and --nodelete. It simplifies starting the development server by automatically feeding in the required authentication and store details.
+- ```shopify theme dev up``` This is a shorthand command for running shopify theme dev with predefined arguments: ```--password=$SHOPIFY_ACCESS_TOKEN```, ```--store=$SHOPIFY_STORE```, and ```--nodelete```. It simplifies starting the development server by automatically feeding in the required authentication and store details.
 
 - ```shopify theme list``` Lists all available themes and their details for your Shopify store. This command helps you quickly view and manage your themes without needing additional parameters.
 
-- ```shopify theme push``` This command is DISABLED in the development environment to prevent themes from being pushed directly, ensuring that all deployments go through the designated deployment pipeline for better version control and consistency.
+- ```shopify theme push``` This command is **DISABLED** in the development environment to prevent themes from being pushed directly, ensuring that all deployments go through the designated deployment pipeline for better version control and consistency.
 
 - ```shopify show store-config``` Displays the current environment variables related to your Shopify store configuration. This command outputs the values for SHOPIFY_STORE, THEME_ID, and SHOPIFY_ACCESS_TOKEN, allowing you to quickly review the current setup without opening configuration files manually.
 
@@ -126,7 +127,7 @@ To interact with the Shopify CLI within the running container, you can execute c
 # Access the container's shell
 docker exec -it shopify-cli-container /bin/bash
 
-# Run Shopify CLI commands inside the container
+# Run Shopify CLI [SAMPLE] commands inside the container
 shopify theme pull --store="$SHOPIFY_STORE" --theme="$THEME_ID" --password="$SHOPIFY_ACCESS_TOKEN"
 ```
 

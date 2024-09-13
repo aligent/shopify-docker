@@ -60,6 +60,18 @@ fi
 if ! grep -qx "local.env" .gitignore; then
     echo "local.env" >> .gitignore
     echo "Added 'local.env' to .gitignore to prevent it from being tracked by Git."
+    
+    echo "Dockerfile" >> .gitignore
+    echo "Added 'Dockerfile' to .gitignore to prevent it from being tracked by Git."
+
+    echo "docker-compose.yml" >> .gitignore
+    echo "Added 'docker-compose.yml' to .gitignore to prevent it from being tracked by Git."
+
+    echo "setup.sh" >> .gitignore
+    echo "Added 'setup.sh' to .gitignore to prevent it from being tracked by Git."
+
+    echo "assets" >> .gitignore
+    echo "Added 'assets' to .gitignore to prevent it from being tracked by Git."
 else
     echo "'local.env' is already listed in .gitignore."
 fi
