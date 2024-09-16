@@ -33,7 +33,7 @@ elif [[ "$1" == "theme" && "$2" == "list" ]]; then
 elif [[ "$1" == "theme" && "$2" == "pull" ]]; then
     if [[ $# -eq 2 ]]; then
         echo "Running 'shopify theme pull' with default parameters."
-        /usr/bin/shopify-original theme pull --password="$SHOPIFY_ACCESS_TOKEN" --store="$SHOPIFY_STORE
+        /usr/bin/shopify-original theme pull --password="$SHOPIFY_ACCESS_TOKEN" --store="$SHOPIFY_STORE"
     else
         # Forward the original command with all arguments if parameters are provided
         /usr/bin/shopify-original "$@"

@@ -8,25 +8,19 @@ definitions:
         script:
           - echo "Starting THEME CHECK..."
           - ruby -v && node -v && npm -v && shopify version
-          - find . -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
+          - ls -alR #list files in the current directory
           - echo -e "\nRunning shopify theme check --fail-level=$FAIL_LEVEL\n"; shopify theme check --fail-level=$FAIL_LEVEL
+          - echo -e "Done THEME CHECK\n"
 
     - step: &deploy
         name: Deploy Theme
         script:
-          - echo "Starting THEME CHECK..."
-          - ruby -v && node -v && npm -v && shopify version
-          - find . -exec ls -ld --time-style=long-iso {} \; | awk '{print $6, $7, $8, $9}'
-          - echo -e "\nRunning shopify theme check --fail-level=$FAIL_LEVEL\n"; shopify theme check --fail-level=$FAIL_LEVEL
           - echo -e "DEPLOYING to $BITBUCKET_DEPLOYMENT_ENVIRONMENT...\n\n$ASCII_LABEL\n"
           - echo -e "shopify theme push --store=$SHOPIFY_STORE --password=$SHOPIFY_CLI_ACCESS_TOKEN --theme=$THEME_ID $THEME_PUSH_ARGS\n"
           - shopify theme push --store="$SHOPIFY_STORE" --password="$SHOPIFY_CLI_ACCESS_TOKEN" --theme="$THEME_ID" $THEME_PUSH_ARGS
 
 pipelines:
   branches:
-    feature/*:
-      - step: *theme-check
-
     staging:
       - step:
           <<: *deploy
@@ -42,12 +36,6 @@ pipelines:
           deployment: Production
 
   pull-requests:
-    staging:
+    '**':  # Trigger for all branches
       - step:
-          script:
-            - echo "Skipping theme check and deploy on PR to staging"
-
-    main:
-      - step:
-          script:
-            - echo "Skipping theme check and deploy on PR to main"
+          <<: *theme-check

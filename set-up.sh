@@ -97,49 +97,6 @@ else
     echo "GROUP_ID is already set: $GROUP_ID"
 fi
 
-# Define the function for 'shopify' to support 'env' commands
-FUNCTION_COMMANDS=$(cat << 'EOF'
-shopify() {
-    if [[ $1 == 'env' && $2 == 'init' ]]; then
-        docker-compose build --no-cache && docker-compose up -d 
-    elif [[ $1 == 'env' && $2 == 'start' ]]; then
-        docker-compose start
-    elif [[ $1 == 'env' && $2 == 'stop' ]]; then
-        docker-compose stop
-    else
-        docker exec -it shopify-cli-container shopify "$@"
-    fi
-}
-EOF
-)
-
-# Detect the shell and determine the appropriate profile file
-if [ -n "$BASH_VERSION" ]; then
-    PROFILE_FILE=~/.bashrc
-elif [ -n "$ZSH_VERSION" ]; then
-    PROFILE_FILE=~/.zshrc
-else
-    echo "Unsupported shell: $SHELL. Please manually add the function to your shell profile."
-fi
-
-# Remove the existing 'shopify' function if it exists to avoid duplication
-if grep -q "^shopify() {" "$PROFILE_FILE"; then
-    # Use sed to delete the old function definition from the profile file
-    sed -i '/^shopify() {/,/^}/d' "$PROFILE_FILE"
-    echo "Removed existing 'shopify' function from $PROFILE_FILE to update with the new version."
-fi
-
-# Add the new function definition to the shell profile
-echo "$FUNCTION_COMMANDS" >> "$PROFILE_FILE"
-echo "Added/Updated function: shopify with env commands to $PROFILE_FILE"
-
-# Source the profile to activate the function in the current session
-source "$PROFILE_FILE" || {
-    echo "Error sourcing $PROFILE_FILE. Please check for syntax errors."
-}
-
-echo "Function updated and shell profile reloaded."
-
 # Inform the user to rebuild and restart Docker Compose services
 echo -e "\nPlease run the command to initialize your dev environment:"
-echo -e "shopify dev env init\n"
+echo -e "shopify env init\n"

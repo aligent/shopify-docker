@@ -53,25 +53,48 @@ Navigate to the repository and run the following command so it will not include 
 ```bash
 mkdir temp-clone && cd temp-clone && git init && git remote add origin git@github.com:aligent/shopify-docker.git && git config core.sparseCheckout true && echo "/*" > .git/info/sparse-checkout && echo '!/README.md' >> .git/info/sparse-checkout && git pull --depth=1 origin main && mv * .. && cd .. && rm -rf temp-clone
 ```
+### Step 3: Add aliases to you bash profile
 
-### Step 3: Set Up the Development Environment Variables.
+Add the following line to your ```~/.bash_aliases``` (or .bash_profile, .bashrc, etc) file to be able to run things easily
 
-Run the command to initialize the development environment variables and create the themes folder:
+```bash
+cat << 'EOF' >> ~/.bashrc
+shopify() {
+    if [[ $1 == 'env' && $2 == 'init' ]]; then
+        docker-compose build --no-cache && docker-compose up -d 
+    elif [[ $1 == 'env' && $2 == 'start' ]]; then
+        docker-compose start
+    elif [[ $1 == 'env' && $2 == 'stop' ]]; then
+        docker-compose stop
+    else
+        docker exec -it shopify-cli-container shopify "$@"
+    fi
+}
+EOF
+```
+
+Ensure that you ```source``` your profile to execute the script so that environment variables are set correctly in your current shell session.
+
+```bash
+source ~/.bashrc
+```
+
+### Step 4: Set Up the Development Environment Variables.
+
+Run the command and follow the prompt to initialize the development environment:
 
 ```bash
 source set-up.sh
 ```
+This will set the environment variables and create the ```theme``` folder
 
-Ensure that you use ```source``` to execute the script so that environment variables are set correctly in your current shell session.
-
-
-### Step 4: Initialise Development Environment
+### Step 5: Initialise Development Environment
 
 ```bash
 shopify env init
 ```
 
-### Step 5: Check if Shopify is running
+### Step 6: Check if Shopify is running
 
 Run the shopify version command:
 
@@ -116,16 +139,14 @@ shopify env start
 - SHOPIFY_STORE
 - SHOPIFY_ACCESS_TOKEN
 - FAIL_LEVEL
+```bash
+<options: crash|error|suggestion|style|warning|info>
+```
 
 ### Set Deployments Variable
 
 Staging
 - THEME_ID
-
-- FAIL_LEVEL
-```bash
-<options: crash|error|suggestion|style|warning|info>
-```
 
 - ASCII_LABEL
 
@@ -140,11 +161,6 @@ Staging
 
 Production
 - THEME_ID
-
-- FAIL_LEVEL
-```bash
-<options: crash|error|suggestion|style|warning|info>
-```
 
 - ASCII_LABEL
 
