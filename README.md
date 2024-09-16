@@ -51,7 +51,7 @@ Create a new workspace for your shopify development.
 Navigate to the repository and run the following command so it will not include the repository meta-data and README.md.
 
 ```bash
-mkdir temp-clone && cd temp-clone && git init && git remote add origin git@github.com:aligent/shopify-docker.git && git config core.sparseCheckout true && echo "/*" > .git/info/sparse-checkout && echo '!/README.md' >> .git/info/sparse-checkout && git pull --depth=1 origin main && mv * .. && cd .. && rm -rf temp-clone
+git clone git@github.com:aligent/shopify-docker.git
 ```
 ### Step 3: Add aliases to you bash profile
 
