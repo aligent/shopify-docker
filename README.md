@@ -1,7 +1,5 @@
 # Aligent Shopify Theme Development Template
 
-**Version**: (beta) 1.0  
-
 ## Description
 
 Docker image for running the shopify-cli command without requiring it to be installed locally. It includes setup script, few custom shopify commands that simplifies working with Shopify themes via the shopify_wrapper, and yml file for integrating with Bitbucket Pipelines. 
@@ -55,7 +53,7 @@ git clone git@github.com:aligent/shopify-docker.git
 ```
 ### Step 3: Add aliases to you bash profile
 
-Add the following line to your ```~/.bash_aliases``` (or .bash_profile, .bashrc, etc) file to be able to run things easily
+Add the following line to your ```~/.bashrc``` (or .bash_profile, .bash_aliases, etc) file to be able to run things easily
 
 ```bash
 cat << 'EOF' >> ~/.bashrc
@@ -133,7 +131,7 @@ shopify env stop
 shopify env start
 ```
 
-## Configuring Shopify Theme Bitbucket Pipeline
+## Configuring Shopify Theme Bitbucket Pipeline \[for DevOps\]
 
 ### Set Repository Variables
 - SHOPIFY_STORE
