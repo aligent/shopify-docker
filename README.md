@@ -40,18 +40,15 @@ Currently, this setup only supports Bitbucket Pipelines. If the client's reposit
 
 ## Instructions
 
-### Step 1: Create NEW folder for your shopify development.
-
-Create a new workspace for your shopify development.
-
-### Step 2: Download this repo.
-
-Navigate to the repository and run the following command so it will not include the repository meta-data and README.md.
+### Step 1: Download this repo.
 
 ```bash
 git clone git@github.com:aligent/shopify-docker.git
 ```
-### Step 3: Add aliases to you bash profile
+
+And then ```cd shopify-docker```.
+
+### Step 2: Add aliases to you bash profile
 
 Add the following line to your ```~/.bashrc``` (or .bash_profile, .bash_aliases, etc) file to be able to run things easily
 
@@ -77,7 +74,7 @@ Ensure that you ```source``` your profile to execute the script so that environm
 source ~/.bashrc
 ```
 
-### Step 4: Set Up the Development Environment Variables.
+### Step 3: Set Up the Development Environment Variables.
 
 Run the command and follow the prompt to initialize the development environment:
 
@@ -86,13 +83,13 @@ source set-up.sh
 ```
 This will set the environment variables and create the ```theme``` folder
 
-### Step 5: Initialise Development Environment
+### Step 4: Initialise Development Environment
 
 ```bash
 shopify env init
 ```
 
-### Step 6: Check if Shopify is running
+### Step 5: Check if Shopify is running
 
 Run the shopify version command:
 

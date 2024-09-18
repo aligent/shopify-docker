@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Load environment variables from the local.env file inside the container
 if [ -f "/shopify/local.env" ]; then
     # Load environment variables, handling potential errors in the local.env format
@@ -16,23 +15,24 @@ if [ -z "$SHOPIFY_STORE" ] || [ -z "$THEME_ID" ] || [ -z "$SHOPIFY_ACCESS_TOKEN"
     exit 1
 fi
 
-# Create a group and user matching the host USER_ID and GROUP_ID to avoid permission issues
-if ! id "shopifyuser" &>/dev/null; then
-    groupadd -g "$GROUP_ID" shopifygroup && \
-    useradd -l -u "$USER_ID" -g shopifygroup -m shopifyuser 2>/dev/null
-fi
-
 # Create the /shopify/theme directory if it does not exist and set permissions
 if [ ! -d "/shopify/theme" ]; then
     mkdir -p /shopify/theme
 fi
 
+# Check if the user exists; if not, create it with the host's UID and GID
+if ! id "shopifyuser" &>/dev/null; then
+    groupadd -g "$GROUP_ID" shopifygroup
+    useradd -l -u "$USER_ID" -g shopifygroup -m shopifyuser
+else
+    # Modify the existing shopifyuser to match the current UID and GID if needed
+    usermod -u "$USER_ID" shopifyuser
+    groupmod -g "$GROUP_ID" shopifygroup
+fi
+
 # Adjust permissions for the /shopify directory and Shopify CLI assets
 chown -R shopifyuser:shopifygroup /shopify
 chown -R shopifyuser:shopifygroup /usr/lib/node_modules/@shopify/cli/dist/assets/cli-ruby
-
-# Switch to shopifyuser
-su shopifyuser
 
 # Execute the passed command or default to bash
 exec "$@"
